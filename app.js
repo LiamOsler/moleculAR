@@ -16,7 +16,7 @@ var catalogRouter = require('./routes/catalog');
 
 var app = express();
 
-http.createServer(app).listen(80);
+http.createServer(app).listen(8000);
 https.createServer(
     {
       key: fs.readFileSync("key.pem"),
