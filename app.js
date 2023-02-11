@@ -16,17 +16,14 @@ var catalogRouter = require('./routes/catalog');
 
 var app = express();
 
-https
-  .createServer(
-		// Provide the private and public key to the server by reading each
-		// file's content with the readFileSync() method.
+http.createServer(app).listen(80);
+https.createServer(
     {
       key: fs.readFileSync("key.pem"),
       cert: fs.readFileSync("cert.pem"),
     },
     app
-  )
-  .listen(4000, () => {
+  ).listen(4000, () => {
     console.log("server is running at port 4000");
   });
 
