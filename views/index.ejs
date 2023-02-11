@@ -1,0 +1,32 @@
+<%- include('partials/header') %>
+<%-include('partials/navbar')%>
+
+    <div class="pb-5 mb-4 bg-light rounded-3 bg-dark text-white">
+      <div class=" py-5">
+        <h1 class="display-5 fw-bold">Chemistry + Augmented Reality</h1>
+        <p class="col-md-8 fs-4">This augmented reality chemistry app is an immersive and interactive way to explore the world of chemistry. The app uses augmented reality technology to visualize and interact with molecules, atoms, and elements in 3D.</p>
+        <div class ="col-md-4">
+        <a href="/catalog" class="btn btn-outline-light btn-lg" type="button">
+          Browse catalog
+        </a>
+        </div>
+      </div>
+
+    <div class="row align-items-md-stretch">
+      <div class="col-md-6 mb-4">
+        <div class="h-100 text-white bg-dark rounded-3">
+          <h2>Molecular Data</h2>
+          <p>MOL files contains the atomic coordinates and bond information of the molecule. This information is used to create a 3D visualization of the molecule. Using a MOL file to create a molecule allows for the visualization of the molecule in its natural state, which can help with understanding the molecular structure and its properties. </p>
+          <button class="btn btn-outline-light" type="button">Example button</button>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="h-100 rounded-3">
+          <h2>About</h2>
+          <p>This app uses AR.js and Three.js to create the 3D scene in the front end of the browser. AR.js is a JavaScript library that enables the use of Augmented Reality in web applications. It is used to detect markers and display 3D models in the user's environment. Three.js is a JavaScript library that enables the development of 3D graphics in the browser. It is used to create the 3D models of the molecules, atoms, and elements that are displayed in the 3D scene. By combining AR.js and Three.js, this app is able to create an interactive and immersive 3D scene in the browser.</p>
+          <button class="btn btn-outline-secondary" type="button">Example button</button>
+        </div>
+      </div>
+    </div>
+
+<%- include('partials/footer') %>

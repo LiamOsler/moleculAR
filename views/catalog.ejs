@@ -1,0 +1,39 @@
+<%- include('partials/header') %>
+<%-include('partials/navbar')%>
+<div class="pb-5 mb-4 bg-light rounded-3 bg-dark text-white">
+    <div class=" pt-5">
+      <h1 class="display-5 fw-bold">Catalog</h1>
+      <div class ="col-md-4">
+      </div>
+    </div>
+<p>
+    <table class = "table text-white">
+        <tr>
+            <th>Name</th>
+            <th>Molecular Formula</th>
+            <th>ChemSpider ID</th>
+        </tr>
+        <%
+        let listNumbers = list.map((item) => {
+            return item.replace(".mol", "")
+        })
+        listNumbers.sort(
+            function(a, b) {
+                return a - b;
+            }
+        )
+        %>
+        <% for (let item of listNumbers){%>
+            <tr>
+                <td>2-Acetoxy-3-carboxy-N,N,N-trimethyl-1-propanaminium</td>
+                <td>Formula</td>
+
+                <td><%= String(item).padStart(3, '0') %></td>
+            </tr>
+        <%}%>
+    </table>
+
+</p>
+
+
+<%- include('partials/footer') %>
