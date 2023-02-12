@@ -13,6 +13,8 @@
     <script src="/threex/threex-artoolkitcontext.js"></script>
     <script src="/threex/threex-arbasecontrols.js"></script>
     <script src="/threex/threex-armarkercontrols.js"></script>
+    <script src="/cjson/converter.js"></script>
+
   </head>
 
 <html>
@@ -123,18 +125,28 @@
     }); 
 
     let testJSON = (<%- JSON.stringify(testJSON) %>);
-    console.log(testJSON);
-    
-    mesh1 = new THREE.Mesh( geometry1, material1 );
-    mesh1.position.y = 0.5;
-  
-    // markerRoot1.add( mesh1 );
+    let molfile = (<%- JSON.stringify(molfile) %>);
+    let molObject = molFileToJSON(molfile);
+    console.log(molObject);
 
-    const geometry = new THREE.SphereGeometry( 1, 32, 16 );
-    const material = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
-    const sphere = new THREE.Mesh( geometry, material1 );
-    sphere.position.y = 0.5;
-    markerRoot1.add( sphere );
+    let moleculeGroup = new THREE.Group();
+    
+    for(let item of molObject.atoms){
+      const material = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
+      const geometry = new THREE.SphereGeometry( .1, 32, 16 );
+      const sphere = new THREE.Mesh( geometry, material1 );
+      sphere.position.x = item.position.x/2;
+      sphere.position.y = item.position.y/2;
+      sphere.position.z = item.position.z/2;
+      moleculeGroup.add( sphere );
+    }
+    
+    markerRoot1.add( moleculeGroup );
+    moleculeGroup.rotation.x = 1;
+
+    moleculeGroup.position.y = 0.5;
+
+    // markerRoot1.add( sphere );
   }
   
   

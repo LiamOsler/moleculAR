@@ -33,5 +33,5 @@ const molFileToJSON = (molFile) => {
     }
     molObj.atoms = atomsArray;
 
-    return JSON.stringify(molObj, null, 2);
+    return molObj;
 }
