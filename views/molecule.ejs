@@ -33,6 +33,9 @@
   var arToolkitSource, arToolkitContext;
   
   var markerRoot1, markerRoot2;
+
+  var moleculeGroup = new THREE.Group();
+
   
   var mesh1;
   
@@ -43,7 +46,7 @@
   {
     scene = new THREE.Scene();
   
-    let ambientLight = new THREE.AmbientLight( 0xcccccc, 0.5 );
+    let ambientLight = new THREE.AmbientLight( 0xffffff, 1 );
     scene.add( ambientLight );
           
     camera = new THREE.Camera();
@@ -120,7 +123,7 @@
     let geometry1	= new THREE.CubeGeometry(1,1,1);
     let material1	= new THREE.MeshNormalMaterial({
       transparent: true,
-      opacity: 0.5,
+      opacity: 0.8,
       side: THREE.DoubleSide
     }); 
 
@@ -129,22 +132,113 @@
     let molObject = molFileToJSON(molfile);
     console.log(molObject);
 
-    let moleculeGroup = new THREE.Group();
     
     for(let item of molObject.atoms){
-      const material = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
-      const geometry = new THREE.SphereGeometry( .1, 32, 16 );
-      const sphere = new THREE.Mesh( geometry, material1 );
-      sphere.position.x = item.position.x/2;
-      sphere.position.y = item.position.y/2;
+      let material;
+      let meshNormalMaterial = new THREE.MeshNormalMaterial({
+        transparent: true,
+        opacity: 0.1,
+        side: THREE.DoubleSide
+      });
+      switch(item.type){
+        case "C":
+          material = new THREE.MeshStandardMaterial( { 
+            color: 0xaaaaaa,
+            transparent: true,
+            opacity: 0.8,
+            side: THREE.DoubleSide
+          } );
+          break;
+        case "H":
+          material = new THREE.MeshStandardMaterial( { 
+            color: 0xffffff,
+            transparent: true,
+            opacity: 0.8,
+            side: THREE.DoubleSide
+          } );
+          break;
+        case "O":
+          material = new THREE.MeshStandardMaterial( { 
+            color: 0xff0000,
+            transparent: true,
+            opacity: 0.8,
+            side: THREE.DoubleSide
+          } );
+          break;
+        case "N":
+          material = new THREE.MeshStandardMaterial( { 
+            color: 0x0000ff,
+            transparent: true,
+            opacity: 0.8,
+            side: THREE.DoubleSide
+          } );
+          break;
+        case "S":
+          material = new THREE.MeshStandardMaterial( { 
+            color: 0xffff00,
+            transparent: true,
+            opacity: 0.8,
+            side: THREE.DoubleSide
+          } );
+          break;
+        default:
+          material = new THREE.MeshStandardMaterial( { 
+            color: 0x555555,
+            transparent: true,
+            opacity: 0.8,
+            side: THREE.DoubleSide
+          } );
+      }
+      let geometry;
+      switch(item.type){
+        case "C":
+          geometry = new THREE.SphereGeometry( .2, 32, 16 );
+          geometry2 = new THREE.SphereGeometry( .3, 32, 16 );
+          break;
+        case "H":
+          geometry = new THREE.SphereGeometry( .1, 32, 16 );
+          geometry2 = new THREE.SphereGeometry( .3, 32, 16 );
+
+          break;
+        case "O":
+          geometry = new THREE.SphereGeometry( .1, 32, 16 );
+          geometry2 = new THREE.SphereGeometry( .3, 32, 16 );
+
+          break;
+        case "N":
+          geometry = new THREE.SphereGeometry( .1, 32, 16 );
+          geometry2 = new THREE.SphereGeometry( .3, 32, 16 );
+          break;
+        case "S":
+          geometry = new THREE.SphereGeometry( .1, 32, 16 );
+          geometry2 = new THREE.SphereGeometry( .3, 32, 16 );
+
+          break;
+        default:
+          geometry = new THREE.SphereGeometry( .1, 32, 16 );
+          geometry2 = new THREE.SphereGeometry( .3, 32, 16 );
+
+      }
+      const sphere = new THREE.Mesh( geometry, material );
+      const normalSphere = new THREE.Mesh( geometry2, meshNormalMaterial );
+
+      sphere.position.x = item.position.y/2;
+      sphere.position.y = item.position.x/2;
       sphere.position.z = item.position.z/2;
+      
+      normalSphere.position.x = item.position.y/2;
+      normalSphere.position.y = item.position.x/2;
+      normalSphere.position.z = item.position.z/2;
+      
       moleculeGroup.add( sphere );
+      moleculeGroup.add( normalSphere );
     }
     
     markerRoot1.add( moleculeGroup );
-    moleculeGroup.rotation.x = 1;
 
-    moleculeGroup.position.y = 0.5;
+    moleculeGroup.position.y = -1;
+    
+
 
     // markerRoot1.add( sphere );
   }
@@ -169,6 +263,9 @@
     requestAnimationFrame(animate);
     deltaTime = clock.getDelta();
     totalTime += deltaTime;
+
+    // moleculeGroup.rotation.y+=.5*deltaTime;
+
     update();
     render();
   }
