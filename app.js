@@ -13,10 +13,12 @@ var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var moleculeRouter = require('./routes/molecule');
 var catalogRouter = require('./routes/catalog');
+var itemRouter = require('./routes/item');
+
 
 var app = express();
 
-// http.createServer(app).listen(8000);
+http.createServer(app).listen(8000);
 https.createServer(
     {
       key: fs.readFileSync("key.pem"),
@@ -41,6 +43,7 @@ app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/molecule', moleculeRouter);
 app.use('/catalog', catalogRouter);
+app.use('/item', itemRouter);
 
 
 // catch 404 and forward to error handler
@@ -57,7 +60,7 @@ app.use(function(err, req, res, next) {
   
   // render the error page
   res.status(err.status || 500);
-  res.render('error');
+  res.render('error', {title: 'MoleculAR - Error'});
 });
 
 module.exports = app;

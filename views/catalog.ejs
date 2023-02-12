@@ -9,9 +9,9 @@
 <p>
     <table class = "table text-white">
         <tr>
+            <th>Item</th>
             <th>Name</th>
-            <th>Molecular Formula</th>
-            <th>ChemSpider ID</th>
+            <th>Formula</th>
         </tr>
         <%
         let listNumbers = list.map((item) => {
@@ -25,10 +25,9 @@
         %>
         <% for (let item of listNumbers){%>
             <tr>
-                <td>2-Acetoxy-3-carboxy-N,N,N-trimethyl-1-propanaminium</td>
+                <td><a href = "/item/<%=item%>"><%= String(item).padStart(3, '0') %></a></td>
+                <td>Name</td>
                 <td>Formula</td>
-
-                <td><%= String(item).padStart(3, '0') %></td>
             </tr>
         <%}%>
     </table>

@@ -4,7 +4,7 @@ var fs = require('fs');
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-  res.render('molecule', { title: 'Molecule Viewer Test', testJSON: {name: 'test'}});
+  res.redirect('/catalog');
 });
 
 router.get('/:id', function(req , res){
@@ -14,7 +14,7 @@ router.get('/:id', function(req , res){
   }
   if(molfiles.includes(req.params.id)){
     var molfile = fs.readFileSync('./public/molfiles/'+req.params.id+'.mol', 'utf8');
-    res.render('molecule', {title: 'Molecule Viewer: '+ req.params.id, itemNum:req.params.id, molfile: molfile, testJSON: {name: 'test'}});
+    res.render('item', {title: 'Molecule Viewer: '+ req.params.id, item: req.params.id, molfile: molfile});
   }else{
     res.render('error', {title: 'Error', message: 'Molecule not found', error: {status: 404, stack: ''}});
   }
