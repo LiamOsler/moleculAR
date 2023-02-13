@@ -28,7 +28,7 @@ const molFileToJSON = (molFile) => {
         atom.position.x = split[i].slice(0, 10).trim();
         atom.position.y = split[i].slice(10, 20).trim();
         atom.position.z = split[i].slice(20, 30).trim();
-        atom.type = split[i].slice(31, 32).trim();
+        atom.type = split[i].slice(31, 33).trim();
         atomsArray.push(atom);
     }
     molObj.atoms = atomsArray;
