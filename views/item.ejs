@@ -5,37 +5,47 @@
 
 <div class="pb-5 mb-4 bg-light rounded-3 bg-dark text-white">
   <div class="row align-items-md-stretch">
-    <div class="col-md-6">
+      <div class="col-12">
         <div class="h-100 rounded-3 text-center">
-            <div id="qrcode" class="d-flex justify-content-center"></div>
-
-            <script type="text/javascript">
-            new QRCode(document.getElementById("qrcode"), window.location.href.replace("item", "molecule").replace("http://", "https://"));
-            </script>
-            <a href = <%= "/molecule/" +item %>>
-                Open link
-            </a>
-
-            <h2 class ="mt-2">QR Code</h2>
-            <p>Scan this QR code with your handset to view Molecule in AR, or click the link above to open the viewer on this device.</p>
+          <div class = "card bg-dark p-4 ">
+          <div class = "row">
+            <div class="col-md-6">
+              <div class="h-100 rounded-3 text-center">
+                  <div id="qrcode" class="d-flex justify-content-center"></div>
+                  <script type="text/javascript">
+                  new QRCode(document.getElementById("qrcode"), window.location.href.replace("item", "molecule").replace("http://", "https://"));
+                  </script>
+                  <a href = <%= "/molecule/" +item %>>
+                      Open link
+                  </a>
+                  <h2 class ="mt-2">QR Code</h2>
+                  <div class = "d-flex justify-content-center">
+                    <p class ="col-sm-8">Scan this QR code with your handset to view Molecule in AR, or click the link above to open the viewer on this device.</p>
+                  </div>  
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="h-100 rounded-3 text-center">
+                  <img src="https://stemkoski.github.io/AR-Examples/markers/kanji.png" height="256"  alt="">
+                  <br>
+                  <a href ="https://stemkoski.github.io/AR-Examples/markers/kanji.png">
+                    Open the tracking marker in a new window
+                  </a>
+                  <h2 class ="mt-2">Tracking Marker</h2>
+                  <div class = "d-flex justify-content-center">
+                    <p class ="col-sm-8">Point your handset at this tracking marker to see the molecule in 3D. Ensure the white border is fully visible.</p>
+                  </div>
+                </div>
+            </div>
+          </div>
+        </div>
         </div>
     </div>
-    <div class="col-md-6">
-        <div class="h-100 rounded-3 text-center">
-          <img src="https://stemkoski.github.io/AR-Examples/markers/kanji.png" height="256"  alt="">
-          <br>
-          <a href ="https://stemkoski.github.io/AR-Examples/markers/kanji.png">
-            Open the tracking marker in a new window
-          </a>
-          <h2 class ="mt-2">Tracking Marker</h2>
-          <p>Point your handset at this tracking marker to see the molecule in 3D. Ensure the white border is fully visible.</p>
-        </div>
-    </div>
 
-    <div class="col-md-12 mb-4">
-      <div class="text-white bg-dark rounded-3">
-        <h2>Mol File</h2>
-        <div class ="card bg-dark mb-5">
+    <div class="col-md-12 mb-4 mt-3">
+      <div class="text-white bg-dark">
+        <div class ="card bg-dark mb-5 p-5">
+          <h2>Mol File</h2>
             <pre>
                 <%= molfile %>
             </pre>
