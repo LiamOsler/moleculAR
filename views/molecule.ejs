@@ -153,7 +153,7 @@
           material = new THREE.MeshStandardMaterial( { 
             color: 0xffffff,
             transparent: true,
-            opacity: 0.8,
+            opacity: 0.9,
             side: THREE.DoubleSide
           } );
           break;
@@ -181,6 +181,15 @@
             side: THREE.DoubleSide
           } );
           break;
+        case "P":
+          material = new THREE.MeshStandardMaterial( { 
+            color: 0xffa500,
+            transparent: true,
+            opacity: 0.8,
+            side: THREE.DoubleSide
+          } );
+          break;
+        
         default:
           material = new THREE.MeshStandardMaterial( { 
             color: 0x555555,
@@ -196,14 +205,12 @@
           geometry2 = new THREE.SphereGeometry( .3, 32, 16 );
           break;
         case "H":
-          geometry = new THREE.SphereGeometry( .1, 32, 16 );
+          geometry = new THREE.SphereGeometry( .05, 32, 16 );
           geometry2 = new THREE.SphereGeometry( .3, 32, 16 );
-
           break;
         case "O":
           geometry = new THREE.SphereGeometry( .1, 32, 16 );
           geometry2 = new THREE.SphereGeometry( .3, 32, 16 );
-
           break;
         case "N":
           geometry = new THREE.SphereGeometry( .1, 32, 16 );
@@ -212,12 +219,14 @@
         case "S":
           geometry = new THREE.SphereGeometry( .1, 32, 16 );
           geometry2 = new THREE.SphereGeometry( .3, 32, 16 );
-
+          break;
+        case "P":
+          geometry = new THREE.SphereGeometry( .2, 32, 16 );
+          geometry2 = new THREE.SphereGeometry( .3, 32, 16 );
           break;
         default:
           geometry = new THREE.SphereGeometry( .1, 32, 16 );
           geometry2 = new THREE.SphereGeometry( .3, 32, 16 );
-
       }
       const sphere = new THREE.Mesh( geometry, material );
       const normalSphere = new THREE.Mesh( geometry2, meshNormalMaterial );

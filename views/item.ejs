@@ -10,7 +10,7 @@
             <div id="qrcode" class="d-flex justify-content-center"></div>
 
             <script type="text/javascript">
-            new QRCode(document.getElementById("qrcode"), window.location.href.replace("item", "molecule"));
+            new QRCode(document.getElementById("qrcode"), window.location.href.replace("item", "molecule").replace("http://", "https://"));
             </script>
             <a href = <%= "/molecule/" +item %>>
                 Open link

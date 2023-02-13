@@ -1,0 +1,31 @@
+
+
+
+  2  1  0  0000  0  0  0  0  0999 V2000
+    0.0000    0.0000    0.0000 O   0  0  0  0  0  0  0  0  0  0  0
+    1.3300    0.0000    0.0000 O   0  0  0  0  0  0  0  0  0  0  0
+  1  2  2  0
+M  END
+
+> <StdInChI>
+InChI=1S/O2/c1-2
+
+> <StdInChIKey>
+MYMOFIZGZYHOMD-UHFFFAOYSA-N
+
+> <AuxInfo>
+1/0/N:1,2/E:(1,2)/rA:2nOO/rB:d1;/rC:;1.33,0,0;
+
+> <Formula>
+O2
+
+> <Mw>
+31.9988
+
+> <SMILES>
+O=O
+
+> <CSID>
+952
+
+$$$$
