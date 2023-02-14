@@ -1,6 +1,12 @@
 <%- include('partials/header') %>
 <%-include('partials/navbar')%>
 
+<style>
+  img{
+    border: 10px solid white;
+  }
+</style>
+
 <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
 
 <div class="pb-5 mb-4 bg-light rounded-3 bg-dark text-white">
@@ -11,7 +17,9 @@
           <div class = "row">
             <div class="col-md-6">
               <div class="h-100 rounded-3 text-center">
-                  <div id="qrcode" class="d-flex justify-content-center"></div>
+                  <a href = <%= "/molecule/" +item %>>
+                    <div id="qrcode" class="d-flex justify-content-center"></div>
+                  </a>
                   <script type="text/javascript">
                   new QRCode(document.getElementById("qrcode"), window.location.href.replace("item", "molecule").replace("http://", "https://"));
                   </script>
@@ -26,7 +34,7 @@
             </div>
             <div class="col-md-6">
                 <div class="h-100 rounded-3 text-center">
-                  <img src="https://stemkoski.github.io/AR-Examples/markers/kanji.png" height="256"  alt="">
+                  <img src="https://stemkoski.github.io/AR-Examples/markers/kanji.png" height="276" width="276" alt="">
                   <br>
                   <a href ="https://stemkoski.github.io/AR-Examples/markers/kanji.png">
                     Open the tracking marker in a new window
@@ -36,11 +44,15 @@
                     <p class ="col-sm-8">Point your handset at this tracking marker to see the molecule in 3D. Ensure the white border is fully visible.</p>
                   </div>
                 </div>
+              </div>
             </div>
           </div>
+          <div class="p-5">
+            <h2><%=formula%></h2> 
+            <h1 class="display-5 fw-bold"><%=name%></h1>
+          </div>
         </div>
-        </div>
-    </div>
+      </div>
 
     <div class="col-md-12 mb-4 mt-3">
       <div class="text-white bg-dark">
