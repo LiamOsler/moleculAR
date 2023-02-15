@@ -48,7 +48,13 @@
   <body style='margin : 0px; overflow: hidden; font-family: Monospace;'>
   <div id="gui_container"></div>
   <div id="text">
+    <a href = "/catalog/" style = "text-decoration: none">
+      ◄ Back to Catalog
+    </a>
+    <br>
+    <p>
       <%= name %> (<%= formula %>)
+    </p>
   </div>
   <!-- 
     Example created by Lee Stemkoski: https://github.com/stemkoski
@@ -316,9 +322,9 @@
     moleculeGroup.translateX(limits.y.min + (limits.y.max - limits.y.min)/2)
     moleculeGroup.translateZ(limits.z.min + (limits.z.max - limits.z.min)/2)
 
-    moleculeGroup.scale.x = 0.25;
-    moleculeGroup.scale.y = 0.25;
-    moleculeGroup.scale.z = 0.25;
+    moleculeGroup.scale.x = 0.5;
+    moleculeGroup.scale.y = 0.5;
+    moleculeGroup.scale.z = 0.5;
         //GUI Configuration
 
     markerRoot1.add( moleculeGroup );
