@@ -4,7 +4,6 @@ var fs = require('fs');
 
 let data = JSON.parse(fs.readFileSync('./public/catalog/catalog.json', "utf8"));
 
-console.log(data)
 
 /* GET home page. */
 router.get('/', function(req, res, next) {

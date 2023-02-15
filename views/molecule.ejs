@@ -27,6 +27,17 @@
         right: 0;
         z-index: 1000 !important;
       }
+      #text{
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: 1000 !important;
+        color: white;
+        font-family: "Lucida Grande", sans-serif;
+        padding: 1em;
+        background-color: #000;
+      }
+
       #gui{
         transform:translate(0, -20px);
       }
@@ -34,10 +45,11 @@
   </head>
 
 <html>
-  <div id="mydiv" data-test=<%= testJSON %>></div>
   <body style='margin : 0px; overflow: hidden; font-family: Monospace;'>
   <div id="gui_container"></div>
-
+  <div id="text">
+      <%= name %> (<%= formula %>)
+  </div>
   <!-- 
     Example created by Lee Stemkoski: https://github.com/stemkoski
     Based on the AR.js library and examples created by Jerome Etienne: https://github.com/jeromeetienne/AR.js/
@@ -156,12 +168,54 @@
   
 
 
+    ////////////////////////////////////////////////////////////
+    // setup molecule
+    ////////////////////////////////////////////////////////////
+    //Load the molfile:
     let molfile = (<%- JSON.stringify(molfile) %>);
     let molObject = molFileToJSON(molfile);
+
+    console.log(molObject);
+
+    //Set the limits of the geometry to 0:
+    let limits = {
+      x: {
+        min: 0,
+        max: 0
+      },
+      y: {
+        min: 0,
+        max: 0
+      },
+      z: {
+        min: 0,
+        max: 0
+      }
+    }
+
     for(let item of molObject.atoms){
+      if(item.x < limits.x.min){
+        limits.x.min = item.x;
+      }
+      if(item.x > limits.x.max){
+        limits.x.max = item.x;
+      }
+      if(item.y < limits.y.min){
+        limits.y.min = item.y;
+      }
+      if(item.y > limits.y.max){
+        limits.y.max = item.y;
+      }
+      if(item.z < limits.z.min){
+        limits.z.min = item.z;
+      }
+      if(item.z > limits.z.max){
+        limits.z.max = item.z;
+      }
+    }
 
-
-
+    //Iterate through the atoms, specify materials and geometry, and add them to the molecule group:
+    for(let item of molObject.atoms){
       let material;
       let meshNormalMaterialBonds = new THREE.MeshNormalMaterial({
         transparent: true,
@@ -169,12 +223,13 @@
         side: THREE.DoubleSide
       });
 
+      let geometry;
       switch(item.type){
         case "C":
           geometry = new THREE.SphereGeometry( .2, 32, 16 );
           geometry2 = new THREE.SphereGeometry( .3, 32, 16 );
           material = new THREE.MeshPhongMaterial( { 
-            color: 0xaaaaaa,
+            color: 0x555555,
             transparent: true,
             opacity: 0.8,
             side: THREE.DoubleSide
@@ -204,7 +259,7 @@
           geometry = new THREE.SphereGeometry( .1, 32, 16 );
           geometry2 = new THREE.SphereGeometry( .3, 32, 16 );
           material = new THREE.MeshPhongMaterial( { 
-            color: 0x0000ff,
+            color: 0x189AB4,
             transparent: true,
             opacity: 0.8,
             side: THREE.DoubleSide
@@ -245,17 +300,29 @@
       const sphere = new THREE.Mesh( geometry, material );
       const normalSphere = new THREE.Mesh( geometry2, meshNormalMaterialBonds );
 
-      sphere.position.x = item.position.y/2;
-      sphere.position.y = item.position.x/2;
-      sphere.position.z = item.position.z/2;
+      sphere.position.x = item.position.y ;
+      sphere.position.y = item.position.x ;
+      sphere.position.z = item.position.z;
       
-      normalSphere.position.x = item.position.y/2;
-      normalSphere.position.y = item.position.x/2;
-      normalSphere.position.z = item.position.z/2;
+      normalSphere.position.x = item.position.y;
+      normalSphere.position.y = item.position.x;
+      normalSphere.position.z = item.position.z;
       
       moleculeGroup.add( sphere );
       moleculeGroup.add( normalSphere );
     }
+
+    moleculeGroup.translateX(limits.x.min + (limits.x.max - limits.x.min)/2)
+    moleculeGroup.translateX(limits.y.min + (limits.y.max - limits.y.min)/2)
+    moleculeGroup.translateZ(limits.z.min + (limits.z.max - limits.z.min)/2)
+
+    moleculeGroup.scale.x = 0.25;
+    moleculeGroup.scale.y = 0.25;
+    moleculeGroup.scale.z = 0.25;
+        //GUI Configuration
+
+    markerRoot1.add( moleculeGroup );
+
 
     var gui = new dat.GUI({ autoPlace: false });
     gui.domElement.id = 'gui';
@@ -271,21 +338,13 @@
     moleculeRotation.add(moleculeGroup.rotation, 'z', -Math.PI*2, Math.PI*2)
     
     const moleculeScale = gui.addFolder('Scale')
-    const scaleX = moleculeScale.add(moleculeGroup.scale, 'x', .1, 2).name("Scaling Factor")
+    const scaleX = moleculeScale.add(moleculeGroup.scale, 'x', .1, 1.5).name("Scaling Factor")
     scaleX.onChange(function(value){
       moleculeGroup.scale.y = value;
       moleculeGroup.scale.z = value;
     })
-
     gui.add(autoRotate, "switch").name("Auto Rotate");
 
-
-    
-    markerRoot1.add( moleculeGroup );
-
-    moleculeGroup.position.y = -1;
-  
-    // markerRoot1.add( sphere );
   }
   
   
