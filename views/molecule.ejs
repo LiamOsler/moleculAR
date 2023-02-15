@@ -13,19 +13,35 @@
     <script src="/threex/threex-artoolkitcontext.js"></script>
     <script src="/threex/threex-arbasecontrols.js"></script>
     <script src="/threex/threex-armarkercontrols.js"></script>
+
+    <!-- include datgui debugging purposes -->
+    <script type="text/javascript" src="/datgui/dat.gui.min.js"></script>
+
+    <!-- include Mol file to CJSON conversion extras -->
     <script src="/cjson/converter.js"></script>
 
+    <style>
+      #gui_container{
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        z-index: 1000 !important;
+      }
+      #gui{
+        transform:translate(0, -20px);
+      }
+    </style>
   </head>
 
 <html>
   <div id="mydiv" data-test=<%= testJSON %>></div>
-<body style='margin : 0px; overflow: hidden; font-family: Monospace;'>
+  <body style='margin : 0px; overflow: hidden; font-family: Monospace;'>
+  <div id="gui_container"></div>
 
   <!-- 
     Example created by Lee Stemkoski: https://github.com/stemkoski
     Based on the AR.js library and examples created by Jerome Etienne: https://github.com/jeromeetienne/AR.js/
   -->
-  
   <script>
   
   var scene, camera, renderer, clock, deltaTime, totalTime;
@@ -36,7 +52,10 @@
 
   var moleculeGroup = new THREE.Group();
 
-  
+  var autoRotate = {
+    switch: false
+  }
+
   var mesh1;
   
   initialize();
@@ -127,12 +146,8 @@
       side: THREE.DoubleSide
     }); 
 
-    let testJSON = (<%- JSON.stringify(testJSON) %>);
     let molfile = (<%- JSON.stringify(molfile) %>);
     let molObject = molFileToJSON(molfile);
-    console.log(molObject);
-
-    
     for(let item of molObject.atoms){
       let material;
       let meshNormalMaterial = new THREE.MeshNormalMaterial({
@@ -242,6 +257,30 @@
       moleculeGroup.add( sphere );
       moleculeGroup.add( normalSphere );
     }
+
+    var gui = new dat.GUI({ autoPlace: false });
+    gui.domElement.id = 'gui';
+    gui_container.appendChild(gui.domElement);
+    const moleculePosition = gui.addFolder('Position')
+    moleculePosition.add(moleculeGroup.position, 'x', -1, 1)
+    moleculePosition.add(moleculeGroup.position, 'y', -1, 1)
+    moleculePosition.add(moleculeGroup.position, 'z', -1, 1)
+
+    const moleculeRotation = gui.addFolder('Rotation')
+    moleculeRotation.add(moleculeGroup.rotation, 'x', -Math.PI*2, Math.PI*2)
+    moleculeRotation.add(moleculeGroup.rotation, 'y', -Math.PI*2, Math.PI*2)
+    moleculeRotation.add(moleculeGroup.rotation, 'z', -Math.PI*2, Math.PI*2)
+    
+    const moleculeScale = gui.addFolder('Scale')
+    const scaleX = moleculeScale.add(moleculeGroup.scale, 'x', .1, 2).name("Scaling Factor")
+    scaleX.onChange(function(value){
+      moleculeGroup.scale.y = value;
+      moleculeGroup.scale.z = value;
+    })
+
+    gui.add(autoRotate, "switch").name("Auto Rotate");
+
+
     
     markerRoot1.add( moleculeGroup );
 
@@ -271,6 +310,9 @@
     deltaTime = clock.getDelta();
     totalTime += deltaTime;
 
+    if(autoRotate.switch){
+      moleculeGroup.rotation.y+=.5*deltaTime;
+    }
     // moleculeGroup.rotation.y+=.5*deltaTime;
 
     update();
