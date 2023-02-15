@@ -67,6 +67,21 @@
   
     let ambientLight = new THREE.AmbientLight( 0xffffff, 1 );
     scene.add( ambientLight );
+    
+    let spotLight = new THREE.SpotLight( 0xffffff );
+    spotLight.position.set( 100, 1000, 100 );
+
+    spotLight.castShadow = true;
+
+    spotLight.shadow.mapSize.width = 1024;
+    spotLight.shadow.mapSize.height = 1024;
+
+    spotLight.shadow.camera.near = 500;
+    spotLight.shadow.camera.far = 4000;
+    spotLight.shadow.camera.fov = 30;
+
+    scene.add( spotLight );
+    
           
     camera = new THREE.Camera();
     scene.add(camera);
@@ -139,25 +154,26 @@
       type: 'pattern', patternUrl: "/data/kanji.patt",
     })
   
-    let geometry1	= new THREE.CubeGeometry(1,1,1);
-    let material1	= new THREE.MeshNormalMaterial({
-      transparent: true,
-      opacity: 0.8,
-      side: THREE.DoubleSide
-    }); 
+
 
     let molfile = (<%- JSON.stringify(molfile) %>);
     let molObject = molFileToJSON(molfile);
     for(let item of molObject.atoms){
+
+
+
       let material;
-      let meshNormalMaterial = new THREE.MeshNormalMaterial({
+      let meshNormalMaterialBonds = new THREE.MeshNormalMaterial({
         transparent: true,
         opacity: 0.1,
         side: THREE.DoubleSide
       });
+
       switch(item.type){
         case "C":
-          material = new THREE.MeshStandardMaterial( { 
+          geometry = new THREE.SphereGeometry( .2, 32, 16 );
+          geometry2 = new THREE.SphereGeometry( .3, 32, 16 );
+          material = new THREE.MeshPhongMaterial( { 
             color: 0xaaaaaa,
             transparent: true,
             opacity: 0.8,
@@ -165,7 +181,9 @@
           } );
           break;
         case "H":
-          material = new THREE.MeshStandardMaterial( { 
+          geometry = new THREE.SphereGeometry( .05, 32, 16 );
+          geometry2 = new THREE.SphereGeometry( .3, 32, 16 );
+          material = new THREE.MeshPhongMaterial( { 
             color: 0xffffff,
             transparent: true,
             opacity: 0.9,
@@ -173,7 +191,9 @@
           } );
           break;
         case "O":
-          material = new THREE.MeshStandardMaterial( { 
+          geometry = new THREE.SphereGeometry( .1, 32, 16 );
+          geometry2 = new THREE.SphereGeometry( .3, 32, 16 );
+          material = new THREE.MeshPhongMaterial( { 
             color: 0xff0000,
             transparent: true,
             opacity: 0.8,
@@ -181,7 +201,9 @@
           } );
           break;
         case "N":
-          material = new THREE.MeshStandardMaterial( { 
+          geometry = new THREE.SphereGeometry( .1, 32, 16 );
+          geometry2 = new THREE.SphereGeometry( .3, 32, 16 );
+          material = new THREE.MeshPhongMaterial( { 
             color: 0x0000ff,
             transparent: true,
             opacity: 0.8,
@@ -189,7 +211,9 @@
           } );
           break;
         case "S":
-          material = new THREE.MeshStandardMaterial( { 
+          geometry = new THREE.SphereGeometry( .1, 32, 16 );
+          geometry2 = new THREE.SphereGeometry( .3, 32, 16 );
+          material = new THREE.MeshPhongMaterial( { 
             color: 0xffff00,
             transparent: true,
             opacity: 0.8,
@@ -197,7 +221,9 @@
           } );
           break;
         case "P":
-          material = new THREE.MeshStandardMaterial( { 
+          geometry = new THREE.SphereGeometry( .2, 32, 16 );
+          geometry2 = new THREE.SphereGeometry( .3, 32, 16 );
+          material = new THREE.MeshPhongMaterial( { 
             color: 0xffa500,
             transparent: true,
             opacity: 0.8,
@@ -206,45 +232,18 @@
           break;
         
         default:
-          material = new THREE.MeshStandardMaterial( { 
+          geometry = new THREE.SphereGeometry( .1, 32, 16 );
+          geometry2 = new THREE.SphereGeometry( .3, 32, 16 );
+          material = new THREE.MeshPhongMaterial( { 
             color: 0x555555,
             transparent: true,
             opacity: 0.8,
             side: THREE.DoubleSide
           } );
       }
-      let geometry;
-      switch(item.type){
-        case "C":
-          geometry = new THREE.SphereGeometry( .2, 32, 16 );
-          geometry2 = new THREE.SphereGeometry( .3, 32, 16 );
-          break;
-        case "H":
-          geometry = new THREE.SphereGeometry( .05, 32, 16 );
-          geometry2 = new THREE.SphereGeometry( .3, 32, 16 );
-          break;
-        case "O":
-          geometry = new THREE.SphereGeometry( .1, 32, 16 );
-          geometry2 = new THREE.SphereGeometry( .3, 32, 16 );
-          break;
-        case "N":
-          geometry = new THREE.SphereGeometry( .1, 32, 16 );
-          geometry2 = new THREE.SphereGeometry( .3, 32, 16 );
-          break;
-        case "S":
-          geometry = new THREE.SphereGeometry( .1, 32, 16 );
-          geometry2 = new THREE.SphereGeometry( .3, 32, 16 );
-          break;
-        case "P":
-          geometry = new THREE.SphereGeometry( .2, 32, 16 );
-          geometry2 = new THREE.SphereGeometry( .3, 32, 16 );
-          break;
-        default:
-          geometry = new THREE.SphereGeometry( .1, 32, 16 );
-          geometry2 = new THREE.SphereGeometry( .3, 32, 16 );
-      }
+
       const sphere = new THREE.Mesh( geometry, material );
-      const normalSphere = new THREE.Mesh( geometry2, meshNormalMaterial );
+      const normalSphere = new THREE.Mesh( geometry2, meshNormalMaterialBonds );
 
       sphere.position.x = item.position.y/2;
       sphere.position.y = item.position.x/2;
