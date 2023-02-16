@@ -1,0 +1,29 @@
+
+
+
+  1  0  0  0000  0  0  0  0  0999 V2000
+    0.0000    0.0000    0.0000 Cl  0  0  0  0  0  0  0  0  0  0  0
+M  END
+
+> <StdInChI>
+InChI=1S/ClH/h1H
+
+> <StdInChIKey>
+VEXZGXHMUGYJMC-UHFFFAOYSA-N
+
+> <AuxInfo>
+1/0/N:1/rA:1nCl/rB:/rC:;
+
+> <Formula>
+Cl H
+
+> <Mw>
+36.46094
+
+> <SMILES>
+Cl
+
+> <CSID>
+307
+
+$$$$
