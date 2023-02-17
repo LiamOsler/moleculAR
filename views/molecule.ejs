@@ -184,42 +184,42 @@
 
     console.log(molObject);
 
-    // //Set the limits of the geometry to 0:
-    // let limits = {
-    //   x: {
-    //     min: 0,
-    //     max: 0
-    //   },
-    //   y: {
-    //     min: 0,
-    //     max: 0
-    //   },
-    //   z: {
-    //     min: 0,
-    //     max: 0
-    //   }
-    // }
+    //Set the limits of the geometry to 0:
+    let limits = {
+      x: {
+        min: 0,
+        max: 0
+      },
+      y: {
+        min: 0,
+        max: 0
+      },
+      z: {
+        min: 0,
+        max: 0
+      }
+    }
 
-    // for(let item of molObject.atoms){
-    //   if(item.x < limits.x.min){
-    //     limits.x.min = item.x;
-    //   }
-    //   if(item.x > limits.x.max){
-    //     limits.x.max = item.x;
-    //   }
-    //   if(item.y < limits.y.min){
-    //     limits.y.min = item.y;
-    //   }
-    //   if(item.y > limits.y.max){
-    //     limits.y.max = item.y;
-    //   }
-    //   if(item.z < limits.z.min){
-    //     limits.z.min = item.z;
-    //   }
-    //   if(item.z > limits.z.max){
-    //     limits.z.max = item.z;
-    //   }
-    // }
+    for(let item of molObject.atoms){
+      if(item.x < limits.x.min){
+        limits.x.min = item.x;
+      }
+      if(item.x > limits.x.max){
+        limits.x.max = item.x;
+      }
+      if(item.y < limits.y.min){
+        limits.y.min = item.y;
+      }
+      if(item.y > limits.y.max){
+        limits.y.max = item.y;
+      }
+      if(item.z < limits.z.min){
+        limits.z.min = item.z;
+      }
+      if(item.z > limits.z.max){
+        limits.z.max = item.z;
+      }
+    }
 
     //Iterate through the atoms, specify materials and geometry, and add them to the molecule group:
     for(let item of molObject.atoms){
@@ -322,7 +322,14 @@
     let bondMaterial = new THREE.MeshPhongMaterial( { 
         color: 0xffffff,
         transparent: true,
-        opacity: 0.8,
+        opacity: 0.5,
+        side: THREE.DoubleSide
+      } );
+    
+    let bondMaterialNormal = new THREE.MeshNormalMaterial( { 
+        color: 0xffffff,
+        transparent: true,
+        opacity: 0.1,
         side: THREE.DoubleSide
       } );
 
@@ -338,11 +345,22 @@
       let point2 = new THREE.Vector3( atom2.position.x, atom2.position.y, atom2.position.z );
       
       let distance = point1.distanceTo(point2);
+      let angle = point1.angleTo(point2);
 
-      const cylinderGeometry = new THREE.CylinderGeometry( 1, 1, distance, 32 );
+      console.log(angle);
+
+      const cylinderGeometry = new THREE.CylinderGeometry( .05, .05, distance, 8 );
+      cylinderGeometry.translate(0, distance / 2, 0);
+      cylinderGeometry.rotateX(Math.PI / 2);
+
       const cylinderMaterial = new THREE.MeshBasicMaterial( {color: 0xffffff} );
-      const cylinder = new THREE.Mesh( cylinderGeometry, cylinderMaterial );
-      scene.add( cylinder );
+      const cylinder = new THREE.Mesh( cylinderGeometry, bondMaterialNormal );
+      cylinder.position.x = atom1.position.x ;
+      cylinder.position.y = atom1.position.y ;
+      cylinder.position.z = atom1.position.z ;
+      cylinder.lookAt(point2);
+
+      moleculeGroup.add( cylinder );
 
 
       console.log(distance);
@@ -352,9 +370,9 @@
 
     }
 
-    // moleculeGroup.translateX(limits.x.min + (limits.x.max - limits.x.min)/2)
-    // moleculeGroup.translateX(limits.y.min + (limits.y.max - limits.y.min)/2)
-    // moleculeGroup.translateZ(limits.z.min + (limits.z.max - limits.z.min)/2)
+    moleculeGroup.translateX( (limits.x.max - limits.x.min) / 2)
+    moleculeGroup.translateY( (limits.y.max - limits.y.min) / 2)
+    moleculeGroup.translateZ( (limits.z.max - limits.z.min) / 2)
 
     moleculeGroup.scale.x = 0.5;
     moleculeGroup.scale.y = 0.5;
@@ -362,7 +380,6 @@
         //GUI Configuration
 
     markerRoot1.add( moleculeGroup );
-
 
     var gui = new dat.GUI({ autoPlace: false });
     gui.domElement.id = 'gui';
@@ -410,7 +427,7 @@
     totalTime += deltaTime;
 
     if(autoRotate.switch){
-      moleculeGroup.rotation.y+=.5*deltaTime;
+      moleculeGroup.rotation.x-=.5*deltaTime;
     }
     // moleculeGroup.rotation.y+=.5*deltaTime;
 
