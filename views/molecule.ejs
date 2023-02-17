@@ -362,17 +362,13 @@
 
       moleculeGroup.add( cylinder );
 
-
       console.log(distance);
-
-      // const lineGeometry = new THREE.BufferGeometry().setFromPoints( points );
-      // const line = new THREE.Line( lineGeometry, lineMaterial );
 
     }
 
-    moleculeGroup.translateX( (limits.x.max - limits.x.min) / 2)
-    moleculeGroup.translateY( (limits.y.max - limits.y.min) / 2)
-    moleculeGroup.translateZ( (limits.z.max - limits.z.min) / 2)
+    moleculeGroup.position.x = ( (limits.x.max - limits.x.min) / 2)
+    moleculeGroup.position.y = ( (limits.y.max - limits.y.min) / 2)
+    moleculeGroup.position.z = ( (limits.z.max - limits.z.min) / 2)
 
     moleculeGroup.scale.x = 0.5;
     moleculeGroup.scale.y = 0.5;
@@ -427,7 +423,7 @@
     totalTime += deltaTime;
 
     if(autoRotate.switch){
-      moleculeGroup.rotation.x-=.5*deltaTime;
+      moleculeGroup.rotation.z-=.5*deltaTime;
     }
     // moleculeGroup.rotation.y+=.5*deltaTime;
 
