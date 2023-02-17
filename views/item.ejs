@@ -1,9 +1,18 @@
 <%- include('partials/header') %>
 <%-include('partials/navbar')%>
 
+<script src='/js/three.js'></script>
+
+<!-- include Mol file to CJSON conversion extras -->
+<script src="/cjson/converter.js"></script>
+
 <style>
   img{
     border: 10px solid white;
+  }
+  #three-area{
+    height: 50vh;
+    width: 100%;
   }
 </style>
 
@@ -13,8 +22,40 @@
   <div class="row align-items-md-stretch">
       <div class="col-12">
         <div class="h-100 rounded-3 text-center">
+          <div class="px-5 py-2">
+            <h2><%=formula%></h2> 
+            <h1 class="fw-bold"><%=name%></h1>
+          </div>
+          <div id ="three-area" class = "mb-2">
+
+          </div>
           <div class = "card bg-dark p-4 ">
           <div class = "row">
+            <div class="col-md-12 mb-4">
+              <div class="h-100 rounded-3 text-center">
+                <div class="d-grid gap-2">
+                  <a class="btn btn-outline-light" type="button">Augmented Reality Using WebXR</a>
+                  <a class="btn btn-outline-light" type="button">View in Augmented Reality Using Marker Tracking</a>
+                </div>
+              </div>  
+            </div>
+            <div class="collapse" id="view3D">
+              <div class = "col-md-12 pb-4">
+                <h2>View in 3D without Augmented Reality:</h2> 
+                <p>View a representation of the molecule in 3D without using augmented reality. Does not require a camera or access to device sensors. Works on almost all devices.</p>
+              </div>
+            </div>
+
+            <div class = "col-md-12 pb-4">
+              <h2>View in Augmented Reality with WebXR:</h2> 
+              <p>View the molecule using WebXR based Augmented Reality. Works on most Android Smartphones. Requires the installation of the WebXR application for use on iOS based devices. Does not support desktop operating systems.</p>
+            </div>
+            <div class = "col-md-12 pb-4">
+              <h2>View in Augmented Reality with Marker Tracking:</h2> 
+              <p>View the molecule using marker based image recognition. Works on any device with a camera. Requires a tracking image (see example below) to be in view of the camera at all times.</p>
+            </div>
+
+            
             <div class="col-md-6">
               <div class="h-100 rounded-3 text-center">
                   <a href = <%= "/molecule/" +item %>>
@@ -47,10 +88,7 @@
               </div>
             </div>
           </div>
-          <div class="p-5">
-            <h2><%=formula%></h2> 
-            <h1 class="display-5 fw-bold"><%=name%></h1>
-          </div>
+
         </div>
       </div>
 
@@ -62,10 +100,252 @@
                 <%= molfile %>
             </pre>
         </div>
-        <p>MOL files contains the atomic coordinates and bond information of the molecule. This information is used to create a 3D visualization of the molecule. Using a MOL file to create a molecule allows for the visualization of the molecule in its natural state, which can help with understanding the molecular structure and its properties. </p>
       </div>
     </div>
-
   </div>
+
+  <script>
+let camera, scene, renderer,
+geometry, material, mesh,
+cube;
+
+var moleculeGroup = new THREE.Group();
+
+const threeArea = document.getElementById('three-area');
+
+init();
+animate(); 
+
+function init() {
+    // stats = new Stats();
+    // stats.domElement.style.position = 'absolute';
+    // stats.domElement.style.left = '0px';
+    // stats.domElement.style.top = '0px';
+    // document.body.appendChild(stats.domElement);
+
+    clock = new THREE.Clock();
+
+    renderer = new THREE.WebGLRenderer({ alpha: true });
+
+    renderer.setSize( threeArea.offsetWidth, threeArea.offsetHeight );
+    // renderer.setClearColor( 0x000000, 0 ); // the default
+
+    threeArea.appendChild( renderer.domElement );
+
+    scene = new THREE.Scene();
+ 
+    camera = new THREE.PerspectiveCamera( 75, threeArea.offsetWidth / threeArea.offsetHeight, 0.1, 1000 );
+    camera.position.z = 5;
+
+    scene.add( camera );
+
+    let molfile = (<%- JSON.stringify(molfile) %>);
+    let molObject = molFileToJSON(molfile);
+
+    console.log(molObject);
+  //Iterate through the atoms, specify materials and geometry, and add them to the molecule group:
+  
+    let firstPoint = new THREE.Vector3(molObject.atoms[0].position.x, molObject.atoms[0].position.y, molObject.atoms[0].position.z);
+
+    console.log(firstPoint)
+  //Calculate the limits of the items:
+    let limits = {
+      x: {
+        min: firstPoint.x,
+        max: firstPoint.x
+      },
+      y: {
+        min: firstPoint.y,
+        max: firstPoint.y
+      },
+      z: {
+        min: firstPoint.z,
+        max: firstPoint.z
+      }
+    }
+
+    for(let item of molObject.atoms){
+      let point = new THREE.Vector3(item.position.x, item.position.y, item.position.z);
+      console.log(point);
+      if(Number(point.x) < Number(limits.x.min)){
+        limits.x.min = point.x;
+      }
+      if(Number(point.x) > Number(limits.x.max)){
+        limits.x.max = point.x;
+      }
+      if(Number(point.y) < Number(limits.y.min)){
+        limits.y.min = point.y;
+      }
+      if(Number(point.y) > Number(limits.y.max)){
+        limits.y.max = point.y;
+      }
+      if(Number(point.z) < Number(limits.z.min)){
+        limits.z.min = point.z;
+      }
+      if(Number(point.z) > Number(limits.z.max))  {
+        limits.z.max = point.z;
+      }
+    }
+
+  for(let item of molObject.atoms){
+      let material;
+      let meshNormalMaterialBonds = new THREE.MeshNormalMaterial({
+        transparent: true,
+        opacity: 0.1,
+        side: THREE.DoubleSide
+      });
+
+      let geometry;
+      switch(item.type){
+        case "C":
+          geometry = new THREE.SphereGeometry( .2, 32, 16 );
+          geometry2 = new THREE.SphereGeometry( .3, 32, 16 );
+          material = new THREE.MeshPhongMaterial( { 
+            color: 0x555555,
+            transparent: true,
+            opacity: 1.0,
+            side: THREE.DoubleSide
+          } );
+          break;
+        case "H":
+          geometry = new THREE.SphereGeometry( .05, 32, 16 );
+          geometry2 = new THREE.SphereGeometry( .3, 32, 16 );
+          material = new THREE.MeshPhongMaterial( { 
+            color: 0xffffff,
+            transparent: true,
+            opacity: 0.9,
+            side: THREE.DoubleSide
+          } );
+          break;
+        case "O":
+          geometry = new THREE.SphereGeometry( .1, 32, 16 );
+          geometry2 = new THREE.SphereGeometry( .3, 32, 16 );
+          material = new THREE.MeshPhongMaterial( { 
+            color: 0xff0000,
+            transparent: true,
+            opacity: 1.0,
+            side: THREE.DoubleSide
+          } );
+          break;
+        case "N":
+          geometry = new THREE.SphereGeometry( .1, 32, 16 );
+          geometry2 = new THREE.SphereGeometry( .3, 32, 16 );
+          material = new THREE.MeshPhongMaterial( { 
+            color: 0x189AB4,
+            transparent: true,
+            opacity: 1.0,
+            side: THREE.DoubleSide
+          } );
+          break;
+        case "S":
+          geometry = new THREE.SphereGeometry( .1, 32, 16 );
+          geometry2 = new THREE.SphereGeometry( .3, 32, 16 );
+          material = new THREE.MeshPhongMaterial( { 
+            color: 0xffff00,
+            transparent: true,
+            opacity: 1.0,
+            side: THREE.DoubleSide
+          } );
+          break;
+        case "P":
+          geometry = new THREE.SphereGeometry( .2, 32, 16 );
+          geometry2 = new THREE.SphereGeometry( .3, 32, 16 );
+          material = new THREE.MeshPhongMaterial( { 
+            color: 0xffa500,
+            transparent: true,
+            opacity: 1.0,
+            side: THREE.DoubleSide
+          } );
+          break;
+        
+        default:
+          geometry = new THREE.SphereGeometry( .1, 32, 16 );
+          geometry2 = new THREE.SphereGeometry( .3, 32, 16 );
+          material = new THREE.MeshPhongMaterial( { 
+            color: 0x555555,
+            transparent: true,
+            opacity: 1.0,
+            side: THREE.DoubleSide
+          } );
+      }
+
+      const sphere = new THREE.Mesh( geometry, material );
+      const normalSphere = new THREE.Mesh( geometry2, meshNormalMaterialBonds );
+
+      sphere.position.x = item.position.x ;
+      sphere.position.y = item.position.y ;
+      sphere.position.z = item.position.z;
+      
+      normalSphere.position.x = item.position.x;
+      normalSphere.position.y = item.position.y;
+      normalSphere.position.z = item.position.z;
+      
+      moleculeGroup.add( sphere );
+      moleculeGroup.add( normalSphere );
+    }
+
+    let bondMaterial = new THREE.MeshPhongMaterial( { 
+        color: 0xffffff,
+        transparent: true,
+        opacity: 0.5,
+        side: THREE.DoubleSide
+      } );
+    
+    let bondMaterialNormal = new THREE.MeshNormalMaterial( { 
+        color: 0xffffff,
+        transparent: true,
+        opacity: 0.1,
+        side: THREE.DoubleSide
+      } );
+
+    for(let bond of molObject.bonds){
+      let index1 = Number(bond[0])-1;
+      let index2 = Number(bond[1])-1;
+
+      let atom1 = molObject.atoms[index1];
+      let atom2 = molObject.atoms[index2];
+
+      let point1 = new THREE.Vector3( atom1.position.x, atom1.position.y, atom1.position.z );
+      let point2 = new THREE.Vector3( atom2.position.x, atom2.position.y, atom2.position.z );
+      
+      let distance = point1.distanceTo(point2);
+
+      const cylinderGeometry = new THREE.CylinderGeometry( .05, .05, distance, 8 );
+      cylinderGeometry.translate(0, distance / 2, 0);
+      cylinderGeometry.rotateX(Math.PI / 2);
+
+      const cylinderMaterial = new THREE.MeshBasicMaterial( {color: 0xffffff} );
+      const cylinder = new THREE.Mesh( cylinderGeometry, bondMaterialNormal );
+      cylinder.position.x = atom1.position.x ;
+      cylinder.position.y = atom1.position.y ;
+      cylinder.position.z = atom1.position.z ;
+      cylinder.lookAt(point2);
+
+      moleculeGroup.add( cylinder );
+
+    }
+
+    moleculeGroup.translateX(-(Number(limits.x.min) + Number(limits.x.max))/2);
+    moleculeGroup.translateY(-(Number((limits.y.min)) + Number(limits.y.max))/2);
+    moleculeGroup.translateY(-(Number((limits.z.min)) + Number(limits.z.max))/2);
+
+
+    console.log(( limits));
+
+
+    const light = new THREE.AmbientLight( 0xffffff ); // soft white light
+    scene.add( light );
+
+
+    scene.add( moleculeGroup );
+}
+
+
+function animate() {
+    requestAnimationFrame( animate );
+
+    renderer.render( scene, camera );
+};
+  </script>
 <%- include('partials/footer') %>
 
