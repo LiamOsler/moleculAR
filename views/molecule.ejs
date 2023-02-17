@@ -5,6 +5,7 @@
     <title><%= title %></title>
     <link rel='stylesheet' href='/styles/style.css' />
     <script src='/js/three.js'></script>
+
     <!-- include jsartookit -->
     <script src="/jsartoolkit5/artoolkit.min.js"></script>
     <script src="/jsartoolkit5/artoolkit.api.js"></script>
@@ -183,42 +184,42 @@
 
     console.log(molObject);
 
-    //Set the limits of the geometry to 0:
-    let limits = {
-      x: {
-        min: 0,
-        max: 0
-      },
-      y: {
-        min: 0,
-        max: 0
-      },
-      z: {
-        min: 0,
-        max: 0
-      }
-    }
+    // //Set the limits of the geometry to 0:
+    // let limits = {
+    //   x: {
+    //     min: 0,
+    //     max: 0
+    //   },
+    //   y: {
+    //     min: 0,
+    //     max: 0
+    //   },
+    //   z: {
+    //     min: 0,
+    //     max: 0
+    //   }
+    // }
 
-    for(let item of molObject.atoms){
-      if(item.x < limits.x.min){
-        limits.x.min = item.x;
-      }
-      if(item.x > limits.x.max){
-        limits.x.max = item.x;
-      }
-      if(item.y < limits.y.min){
-        limits.y.min = item.y;
-      }
-      if(item.y > limits.y.max){
-        limits.y.max = item.y;
-      }
-      if(item.z < limits.z.min){
-        limits.z.min = item.z;
-      }
-      if(item.z > limits.z.max){
-        limits.z.max = item.z;
-      }
-    }
+    // for(let item of molObject.atoms){
+    //   if(item.x < limits.x.min){
+    //     limits.x.min = item.x;
+    //   }
+    //   if(item.x > limits.x.max){
+    //     limits.x.max = item.x;
+    //   }
+    //   if(item.y < limits.y.min){
+    //     limits.y.min = item.y;
+    //   }
+    //   if(item.y > limits.y.max){
+    //     limits.y.max = item.y;
+    //   }
+    //   if(item.z < limits.z.min){
+    //     limits.z.min = item.z;
+    //   }
+    //   if(item.z > limits.z.max){
+    //     limits.z.max = item.z;
+    //   }
+    // }
 
     //Iterate through the atoms, specify materials and geometry, and add them to the molecule group:
     for(let item of molObject.atoms){
@@ -306,21 +307,54 @@
       const sphere = new THREE.Mesh( geometry, material );
       const normalSphere = new THREE.Mesh( geometry2, meshNormalMaterialBonds );
 
-      sphere.position.x = item.position.y ;
-      sphere.position.y = item.position.x ;
+      sphere.position.x = item.position.x ;
+      sphere.position.y = item.position.y ;
       sphere.position.z = item.position.z;
       
-      normalSphere.position.x = item.position.y;
-      normalSphere.position.y = item.position.x;
+      normalSphere.position.x = item.position.x;
+      normalSphere.position.y = item.position.y;
       normalSphere.position.z = item.position.z;
       
       moleculeGroup.add( sphere );
       moleculeGroup.add( normalSphere );
     }
 
-    moleculeGroup.translateX(limits.x.min + (limits.x.max - limits.x.min)/2)
-    moleculeGroup.translateX(limits.y.min + (limits.y.max - limits.y.min)/2)
-    moleculeGroup.translateZ(limits.z.min + (limits.z.max - limits.z.min)/2)
+    let bondMaterial = new THREE.MeshPhongMaterial( { 
+        color: 0xffffff,
+        transparent: true,
+        opacity: 0.8,
+        side: THREE.DoubleSide
+      } );
+
+    for(let bond of molObject.bonds){
+      console.log(bond);
+      let index1 = Number(bond[0])-1;
+      let index2 = Number(bond[1])-1;
+
+      let atom1 = molObject.atoms[index1];
+      let atom2 = molObject.atoms[index2];
+
+      let point1 = new THREE.Vector3( atom1.position.x, atom1.position.y, atom1.position.z );
+      let point2 = new THREE.Vector3( atom2.position.x, atom2.position.y, atom2.position.z );
+      
+      let distance = point1.distanceTo(point2);
+
+      const cylinderGeometry = new THREE.CylinderGeometry( 1, 1, distance, 32 );
+      const cylinderMaterial = new THREE.MeshBasicMaterial( {color: 0xffffff} );
+      const cylinder = new THREE.Mesh( cylinderGeometry, cylinderMaterial );
+      scene.add( cylinder );
+
+
+      console.log(distance);
+
+      // const lineGeometry = new THREE.BufferGeometry().setFromPoints( points );
+      // const line = new THREE.Line( lineGeometry, lineMaterial );
+
+    }
+
+    // moleculeGroup.translateX(limits.x.min + (limits.x.max - limits.x.min)/2)
+    // moleculeGroup.translateX(limits.y.min + (limits.y.max - limits.y.min)/2)
+    // moleculeGroup.translateZ(limits.z.min + (limits.z.max - limits.z.min)/2)
 
     moleculeGroup.scale.x = 0.5;
     moleculeGroup.scale.y = 0.5;
@@ -333,6 +367,7 @@
     var gui = new dat.GUI({ autoPlace: false });
     gui.domElement.id = 'gui';
     gui_container.appendChild(gui.domElement);
+
     const moleculePosition = gui.addFolder('Position')
     moleculePosition.add(moleculeGroup.position, 'x', -1, 1)
     moleculePosition.add(moleculeGroup.position, 'y', -1, 1)
