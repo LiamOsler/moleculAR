@@ -35,13 +35,13 @@ npm start
 
 The server will start listening on port 4000. You can now access the server by visiting http://localhost:4000.
 
-# The Tech Stack
+## The Tech Stack
 
-## Back End:
-### Node.js
+### Back End:
+#### Node.js
 Node.js is an open-source, cross-platform, JavaScript runtime environment that executes JavaScript code outside of a browser. Node.js lets developers use JavaScript to write command line tools and for server-side scripting—running scripts server-side to produce dynamic web page content before the page is sent to the user's web browser.
 
-### Express.js
+#### Express.js
 Express has been called the de facto standard server framework for Node.js. Express provides a minimal and flexible set of features for creating web applications and APIs. It provides a set of features like routing, middleware, view system, etc. It simplifies the server creation process that can be used to create a web application more easily and quickly. Here is a guide to getting started with Express.js: https://expressjs.com/en/starter/installing.html
 
 **Future Action Items:**
@@ -52,14 +52,14 @@ Express has been called the de facto standard server framework for Node.js. Expr
 - Learn how to serve static files in Express.js
 - Learn how to send a variable to a template as part of a response in Express.js
 
-### Templating Engines:
+#### Templating Engines:
 Templating engines are tools used to generate HTML from data and templates. They allow developers to separate the view (HTML) from the controller (data) and create dynamic HTML pages. Templating engines are used in a variety of web development frameworks and technologies, such as Node.js and Express.js. They allow developers to write HTML code with placeholders for variables, which are then replaced with the actual data when the page is rendered. This makes it easier to maintain and update the HTML code. There are quite a few templating engines available. Here is a list in the Express.js docs: https://expressjs.com/en/resources/template-engines.html
 
 **Future Action Items:**
 - Learn about templating engines
 - Learn how to use a templating engine in Express.js
 
-#### EJS (Embedded JavaScript):
+##### EJS (Embedded JavaScript):
 EJS (Embedded JavaScript) is a templating engine used by Node.js developers. It is used to generate HTML from data and templates. It more features such as loops, conditionals, and template inheritance. EJS is simple to use and supports the use of JavaScript for more complex operations. It is often used in combination with Node.js and Express.js to create dynamic web pages. Here is a link to EJS's documentation: https://ejs.co/#docs
 
 **Future Action Items:**
@@ -68,21 +68,12 @@ EJS (Embedded JavaScript) is a templating engine used by Node.js developers. It 
 - Practice using EJS to render a list of items from an array
 - Practice using EJS to render a list of items from a database
 
-## Future opportunities for development around the tech stack:
-### Using a database:
+### Future opportunities for development around the tech stack:
+#### Using a database:
 Currently I am not connecting the front-end of the application to a database. This was primarily for sake of convenience. Thus I am accessing files saved locally within the repository for the such things as the source mol files used to generate the 3D models. Ideally, the contents of the these text files would be stored in a database. The group before us used Supabase, and there is a Supabase library for Node.js: https://www.npmjs.com/package/@supabase/supabase-js which looks promising. If someone in the group feels like they have strong MySQL or MongoDB skills, they could use those instead.
 
 **Future Actions Items:**:
 - Whatever we decide on, ideally we come up with a sensible schema for our database and create a testing database to work with. We may want to come up with a rough idea for both a entity-relationship model and a document-oriented model. In either case the database should be relatively simple in its structure.
-
-### Authenticated User View:
-We probably want to determine to what extent authentication is required for the application. I'm inclined to say we only need on authenticated "view" in the application, which is the "administration" pages, which would involve an authorized user (The client, Mark) being able to upload a new molecule (from a molfile retrieved from Chemspider) and add a new record to the database that includes the corresponding information for the molecule, imported using the Chemspider API. This would require a Chemspider API key to be stored somewhere, to be used as part of the fetch request to the API. We may want to fetch the data in the front-end and have it pre-fill a set of forms, but also let the authorized user edit the data before submitting it to our database.
-
-**Future Action Items:**:
-- Design what this dashboard would look like
-  - The previous group's iteration of the project should form a rough idea.
-  - It may be useful to get information from an instructor here- what information would they want to see on a dashboard like this?
-- Figure out how we're going to insert this in to a database.
 
 
 # Example Exercise:
@@ -366,6 +357,9 @@ The AR.js library requires that the application is served over HTTPs. This is be
 
 When deploying to a cloud service like Azure Websites, HTTPS is enabled by default, so it makes it easier to deploy the application to a platform like Azure. Other services may need more effort in order to be configured to use HTTPS.
 
+## Features in need of implementation:
+### Authenticated User View:
+We probably want to determine to what extent authentication is required for the application. I'm inclined to say we only need on authenticated "view" in the application, which is the "administration" pages, which would involve an authorized user (The client, Mark) being able to upload a new molecule (from a molfile retrieved from Chemspider) and add a new record to the database that includes the corresponding information for the molecule, imported using the Chemspider API. This would require a Chemspider API key to be stored somewhere, to be used as part of the fetch request to the API. We may want to fetch the data in the front-end and have it pre-fill a set of forms, but also let the authorized user edit the data before submitting it to our database.
 
 ## Useful blogs, tutorials and videos:
 Net Ninja Express Tutorials:
