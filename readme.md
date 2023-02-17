@@ -3,7 +3,7 @@
 **Link to Prototype:** https://wicked-awesome-chemistry.azurewebsites.net/
 **Main Readme:** https://git.cs.dal.ca/osler/csci4177-project-readme
 
-This is a web application that allows users to view 3D models of molecules in Augmented Reality. The application uses the AR.js library to detect markers and display 3D models in the browser.
+This is a web application that allows users to view 3D models of molecules in Augmented Reality. The application uses the AR.js library to detect markers and display 3D models in the browser. The models are generated from a mol file and are intended to look like classic "ball and stick" models.
 
 ### Prerequisites
 
@@ -100,12 +100,26 @@ https://wicked-awesome-chemistry.azurewebsites.net/catalog
 
 When I submit a GET request to this route, the server responds with the HTML for the catalog page.
 
-Now, let's consider that the entry point to our application. If you were to generate a new express site using the express command:
+
+## Generating a new Express.js project using the Express Generator
+
+You can install express globally and use the express command to generate a new application by executing the following command in your terminal:
+```bash
+npm install -g express-generator
+```
+
+or
+
+```bash
+npx express-generator
+```
+
+Then, you can generate a new site in your current directory with the following command:
 ```
 express --view=ejs
 ```
 
-You will have a new directory structure that looks something like this:
+You will have a new file and directory structure that looks something like this generated for you:
 ```
 .
 ├── app.js
@@ -138,9 +152,9 @@ After setting some parameters on the express app, we tell the Express app to use
 ```js
 //Note how indexRouter has been called with just a "/"
 app.use('/', indexRouter); 
-//If you visit the base URL + "/users" you will be routed through the usersRouter
+//If you visit the base URL + "/users",
+//you will be routed through the usersRouter:
 app.use('/users', usersRouter);
-
 ```
 
 These correspond to the `index.js` and `users.js` files in the `routes` directory. These files are where we define the routes that the application will respond to. The `index.js` file is where we define the routes for the homepage, and the `users.js` file is where we define the routes for the user management pages.
@@ -233,8 +247,45 @@ If you visited that URL. It would will result in your browser displaying the res
     "lastItem": "Would you like to more?"
 }
 ```
+Notice that router.get is a function that is called every time a route is called. This means we can invoke an operaton every time its called. For example, we could create a counter that increments every time a route is requested: 
+```js
+var counter = 0;
 
-This can be useful if you want to use Express to develop an API. Serving JSON from an API means you have more versatility in how you can use the data. You could use it to build a mobile app, or a desktop app, or a web app. You could even use it to build a game. If you want to build a front-end using React, you could use Express to serve the JSON data to the React app, but you will probably not need to use a templating engine. However, there may be parts of a website which you may want to serve using templating. This might include HTML documentation of the APIs endpoints as a static HTML page, or a page that displays the current status of a server.
+router.get('/', function(req, res, next) {
+  counter++;
+  res.render('index', { title: counter });
+});
+```
+The result is that every time you visit the homepage, the counter will increment by one.
+
+You may notice that counter is defined outside of the router.get function. This is because the router.get function is called every time a route is requested. If we defined the counter inside the router.get function, it would be reset to 0 every time a route was requested.
+
+## The `/catalog` route:
+The `routes/catalog.js` file includes the following code:
+
+```js
+var express = require('express');
+var router = express.Router();
+var fs = require('fs');
+
+/* GET home page. */
+router.get('/', function(req, res, next) {
+    const molfiles = './public/molfiles/';
+    res.render('catalog', { title: 'Catalog', list: fs.readdirSync(molfiles)});
+});
+
+module.exports = router;
+```
+
+to break this down, we first require `express` and `express.Router()`. Since I am creating the catalog page based on a the contents of a file folder, I also require the `fs` module. The `fs` module allows for operations such as reading and writing files, and creating directories. The `fs` module is part of the Node.js standard library, so it does not need to be installed.
+
+I call the `fs.readdirSync` function, which reads the contents of a directory. The `fs.readdirSync` function takes a single parameter, which is the path to the directory. In this case, the path is `./public/molfiles/`. The `./` at the start of the path tells the function to look in the current directory. The `public` directory is the directory that contains the `molfiles` directory. The `molfiles` directory contains the files that will be displayed on the catalog page. The `fs.readdirSync` function returns an array of the names of the files in the directory. This array is passed to the `catalog.ejs` file as the `list` parameter.
+
+The contents of the `molfiles` directory are displayed on the catalog page. The `molfiles` directory contains a number of `.mol` files. These files are retrieved from the Royal Society of Chemistry's chemspider.com website. They are numbered according to their CSID (Chemspider ID), which is typically the default name for the molecule when downloading it from the chemspider.com website using the download button displayed on the page.
+
+Chemspider also has a REST API, which allows you to retrieve the data for a molecule using its CSID. We could use this API to retrieve the data for each molecule, and display it on the catalog page. However, this would require a lot of API calls, which might top out the 1000 call limit per day. Instead, we may want to use the Chemsider API to retrieve a molecule only once it is being added to the MoleculAR catalog. 
+
+This might be something that could be handled on the `/admin/` routes.
 
 ## Adding an admin route to the application:
 
@@ -317,6 +368,7 @@ Of course, there may be things that we want to do like creating "dynamic routes"
 Note how in the previous example I was able to access the the contents of the `style.css` file by using the URL: `/stylesheets/style.css`. This is because Express has a built-in middleware function called `express.static` which is used to serve static files. This means that any files in the `public` directory can be accessed by using the `/public` URL. For instance, if you wanted to access the `style.css` file, you could use the URL: `/public/stylesheets/style.css`.
 
 The `/public/` folder can also be used for serving other things. At the moment of writing, the contents of the molecular viewer prototype's `/public/` folder looks like this:
+
 ```
 .
 ├── catalog
@@ -333,7 +385,7 @@ The `/public/` folder can also be used for serving other things. At the moment o
 Explanation:
 The `catalog` directory included a .JSON file which has information about the particulars of the molecules. The `cjson` folder includes a script called `converter.js` which I wrote converts molfiles to JSON objects. We then have a folder called `data` which included some sample patterns and molecules. The `datgui` folder includes a script called `dat.gui.js` which is used to create a GUI for the application. The `img` folder includes some images which are used in the application. The `js` folder includes the main script for the application. The `jsartoolkit5` folder includes the AR.js library. The `molfiles` folder includes some sample molecules as .mol files . The `threex` folder includes scripts which handle DOM events.
 
-You can see that some of these files are accessed in the header of the `molecule.ejs` file:
+You can see that how these files are accessed in the `molecule.ejs` file:
 
 ```html
 <link rel='stylesheet' href='/styles/style.css' />
@@ -351,15 +403,69 @@ You can see that some of these files are accessed in the header of the `molecule
 <!-- include Mol file to CJSON conversion extras -->
 <script src="/cjson/converter.js"></script>
 ```
+## The Molecule Viewer:
+The primary basis for the viewer application is this example, the "Hello Cube" from Lee Stemkoski's AR.js examples:
+https://github.com/stemkoski/AR-Examples/blob/master/hello-cube.html
+
+The simplest part of this application to modify is the section following the markerRoot setup. This is where we can add our own 3D objects to the scene. For instance, we can add a cube to the scene like this:
+```js
+let geometry1 = new THREE.CubeGeometry(1,1,1);
+let material1 = new THREE.MeshNormalMaterial({
+  transparent: true,
+  opacity: 0.5,
+  side: THREE.DoubleSide
+}); 
+
+mesh1 = new THREE.Mesh( geometry1, material1 );
+mesh1.position.y = 0.5;
+
+markerRoot1.add( mesh1 );
+```
+
+This is normal Three.js code. We create a cube geometry, and a material. We then create a mesh, and add it to the markerRoot. The markerRoot is the object which is attached to the marker. This means that the cube will be attached to the marker. If we instead wanted to add a sphere, we could change the geometry1 properties like this:
+```js
+let geometry1 = new THREE.SphereGeometry(1,32,16);
+let material1 = new THREE.MeshNormalMaterial({
+  transparent: true,
+  opacity: 0.5,
+  side: THREE.DoubleSide
+}); 
+
+mesh1 = new THREE.Mesh( geometry1, material1 );
+mesh1.position.y = 0.5;
+
+markerRoot1.add( mesh1 );
+```
+
+We would instead see a sphere attached to the marker, which is made up of 32 segments in the horizontal direction, and 16 segments in the vertical direction, and has a radius of 1. Read up on the Three.js documentation for more information on how to create 3D objects here: https://threejs.org/docs/index.html#api/en/core/BufferGeometry
+
+Three.js includes a lot of different types of geometries, and materials. For the purposes of representing molecules, spheres: https://threejs.org/docs/index.html#api/en/geometries/SphereGeometry and https://threejs.org/docs/index.html#api/en/geometries/CylinderGeometry are the most useful for creating representations of traditional ball and stick style models.
 
 ## CORS and HTTPS:
 The AR.js library requires that the application is served over HTTPs. This is because the AR.js library uses the WebRTC API, which requires special permissions to be granted by the user. This is why we need to use HTTPS. If you want to develop locally, you can ignore the warnings about the SSL certificate being invalid. If you want to secure the application locally, you will need to generate some SSL certificate credentials. For instruction on how to do this (generating the `cert.pem`, `csr.pem` and `key.pem` files), and how to use them with NodeJS, take a look at this article: https://adamtheautomator.com/https-nodejs/
 
-When deploying to a cloud service like Azure Websites, HTTPS is enabled by default, so it makes it easier to deploy the application to a platform like Azure. Other services may need more effort in order to be configured to use HTTPS.
+When deploying to a cloud service like Azure Websites, HTTPS is enabled by default, which means that you don't need to worry about this.
 
+<<<<<<< HEAD
 ## Features in need of implementation:
 ### Authenticated User View:
 We probably want to determine to what extent authentication is required for the application. I'm inclined to say we only need on authenticated "view" in the application, which is the "administration" pages, which would involve an authorized user (The client, Mark) being able to upload a new molecule (from a molfile retrieved from Chemspider) and add a new record to the database that includes the corresponding information for the molecule, imported using the Chemspider API. This would require a Chemspider API key to be stored somewhere, to be used as part of the fetch request to the API. We may want to fetch the data in the front-end and have it pre-fill a set of forms, but also let the authorized user edit the data before submitting it to our database.
+=======
+**Action Point:** 
+- Learn how to spin up a Azure Websites web application with express.
+- Deploy a copy of this application to the Azure Websites web application.
+- Learn how to do this from the integrated tools in an IDE
+- Set up a pipeline from a remote repository to the Azure Websites web application.
+
+## Deploying to Azure Websites:
+To deploy to Azure Websites, you will need to create an Azure account. Once you have done this, you can create a new web application. You can do this from the Azure Portal, or from the integrated tools in your IDE. Once you have created the web application, you can deploy the application to it. You can do this from the integrated tools in your IDE, or from the command line. If you want to see a helpful guide on how to do this specifically with express.js, take a look at this article: 
+
+https://learn.microsoft.com/en-us/azure/app-service/quickstart-nodejs 
+
+For instructions on using the integrated tools in your IDE, take a look at this blog post:
+
+https://davidgiard.com/deploying-a-web-app-to-azure-from-visual-studio-code
+>>>>>>> f8cb05bc326e9a21039da4086b02dcc95539eac0
 
 ## Useful blogs, tutorials and videos:
 Net Ninja Express Tutorials:
@@ -367,7 +473,6 @@ https://www.youtube.com/watch?v=yXEesONd_54
 
 FreeCodeCamp Data Structures and Algorithms Course:
 https://www.freecodecamp.org/learn/javascript-algorithms-and-data-structures/
-
 
 
 ## Links and resources:
