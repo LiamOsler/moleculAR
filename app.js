@@ -14,6 +14,7 @@ var usersRouter = require('./routes/users');
 var moleculeRouter = require('./routes/molecule');
 var catalogRouter = require('./routes/catalog');
 var itemRouter = require('./routes/item');
+var adminRouter = require('./routes/admin');
 
 
 var app = express();
@@ -44,7 +45,7 @@ app.use('/users', usersRouter);
 app.use('/molecule', moleculeRouter);
 app.use('/catalog', catalogRouter);
 app.use('/item', itemRouter);
-
+app.use('/admin', adminRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
