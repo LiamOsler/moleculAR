@@ -3,6 +3,9 @@
 
 <script src='/js/three.js'></script>
 
+<!-- include datgui debugging purposes -->
+<script type="text/javascript" src="/datgui/dat.gui.min.js"></script>
+
 <!-- include Mol file to CJSON conversion extras -->
 <script src="/cjson/converter.js"></script>
 
@@ -14,6 +17,16 @@
     height: 50vh;
     width: 100%;
   }
+  #gui_container{
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      z-index: 1000 !important;
+    }
+
+    #three-overlay{
+      position: relative;
+    }
 </style>
 
 <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
@@ -26,9 +39,13 @@
             <h2><%=formula%></h2> 
             <h1 class="fw-bold"><%=name%></h1>
           </div>
-          <div id ="three-area" class = "mb-2">
-
+          <div id = "three-overlay">
+            <div id ="three-area" class = "mb-2">
+            </div>
+            <div id="gui_container"></div>
           </div>
+
+
           <div class = "card bg-dark p-4 ">
           <div class = "row">
             <div class="col-md-12 mb-4">
@@ -104,7 +121,7 @@
     </div>
   </div>
 
-  <script>
+  <script>  
 let camera, scene, renderer,
 geometry, material, mesh,
 cube;
@@ -117,11 +134,6 @@ init();
 animate(); 
 
 function init() {
-    // stats = new Stats();
-    // stats.domElement.style.position = 'absolute';
-    // stats.domElement.style.left = '0px';
-    // stats.domElement.style.top = '0px';
-    // document.body.appendChild(stats.domElement);
 
     clock = new THREE.Clock();
 
@@ -134,21 +146,17 @@ function init() {
 
     scene = new THREE.Scene();
  
-    camera = new THREE.PerspectiveCamera( 75, threeArea.offsetWidth / threeArea.offsetHeight, 0.1, 1000 );
-    camera.position.z = 5;
+    camera = new THREE.PerspectiveCamera( 10, threeArea.offsetWidth / threeArea.offsetHeight, 1, 1000 );
 
     scene.add( camera );
 
+    //Get the contents of the molfile and convert it to a JSON object:
     let molfile = (<%- JSON.stringify(molfile) %>);
     let molObject = molFileToJSON(molfile);
 
-    console.log(molObject);
-  //Iterate through the atoms, specify materials and geometry, and add them to the molecule group:
-  
+    //Get the first point in the molecule:  
     let firstPoint = new THREE.Vector3(molObject.atoms[0].position.x, molObject.atoms[0].position.y, molObject.atoms[0].position.z);
-
-    console.log(firstPoint)
-  //Calculate the limits of the items:
+    //Set the initial limits to the first point:
     let limits = {
       x: {
         min: firstPoint.x,
@@ -164,6 +172,7 @@ function init() {
       }
     }
 
+    //Loop through all the points in the molecule and find the limits:
     for(let item of molObject.atoms){
       let point = new THREE.Vector3(item.position.x, item.position.y, item.position.z);
       console.log(point);
@@ -186,6 +195,20 @@ function init() {
         limits.z.max = point.z;
       }
     }
+
+    //Default camera position:
+    camera.position.set( 0, 0, 50 );
+    //Set the camera position based on the limits:
+    if(Math.abs(limits.x.max) > 5 || Math.abs(limits.x.min) > 5 || Math.abs(limits.y.max) > 5 || Math.abs(limits.y.min) > 5 || Math.abs(limits.z.max) > 5 || Math.abs(limits.z.min) > 5){
+      camera.position.set( 0, 0, 100 );
+    }
+    if(Math.abs(limits.x.max) > 10 || Math.abs(limits.x.min) > 10 || Math.abs(limits.y.max) > 10 || Math.abs(limits.y.min) > 10 || Math.abs(limits.z.max) > 10 || Math.abs(limits.z.min) > 10){
+      camera.position.set( 0, 0, 150 );
+    }
+
+    //Creat Vector3 that is the center of the molecule:
+    let moleculeCenter = new THREE.Vector3((Number((limits.x.min)) + Number(limits.x.max))/2, (Number((limits.y.min)) + Number(limits.y.max))/2, (Number((limits.z.min)) + Number(limits.z.max))/2);
+    console.log(moleculeCenter)
 
   for(let item of molObject.atoms){
       let material;
@@ -272,13 +295,13 @@ function init() {
       const sphere = new THREE.Mesh( geometry, material );
       const normalSphere = new THREE.Mesh( geometry2, meshNormalMaterialBonds );
 
-      sphere.position.x = item.position.x ;
-      sphere.position.y = item.position.y ;
-      sphere.position.z = item.position.z;
+      sphere.position.x = item.position.x - moleculeCenter.x;
+      sphere.position.y = item.position.y - moleculeCenter.y;
+      sphere.position.z = item.position.z - moleculeCenter.z;
       
-      normalSphere.position.x = item.position.x;
-      normalSphere.position.y = item.position.y;
-      normalSphere.position.z = item.position.z;
+      normalSphere.position.x = item.position.x - moleculeCenter.x;
+      normalSphere.position.y = item.position.y - moleculeCenter.y;
+      normalSphere.position.z = item.position.z - moleculeCenter.z;
       
       moleculeGroup.add( sphere );
       moleculeGroup.add( normalSphere );
@@ -305,8 +328,8 @@ function init() {
       let atom1 = molObject.atoms[index1];
       let atom2 = molObject.atoms[index2];
 
-      let point1 = new THREE.Vector3( atom1.position.x, atom1.position.y, atom1.position.z );
-      let point2 = new THREE.Vector3( atom2.position.x, atom2.position.y, atom2.position.z );
+      let point1 = new THREE.Vector3( atom1.position.x - moleculeCenter.x, atom1.position.y - moleculeCenter.y, atom1.position.z - moleculeCenter.z);
+      let point2 = new THREE.Vector3( atom2.position.x - moleculeCenter.x, atom2.position.y - moleculeCenter.y, atom2.position.z - moleculeCenter.z);
       
       let distance = point1.distanceTo(point2);
 
@@ -316,21 +339,36 @@ function init() {
 
       const cylinderMaterial = new THREE.MeshBasicMaterial( {color: 0xffffff} );
       const cylinder = new THREE.Mesh( cylinderGeometry, bondMaterialNormal );
-      cylinder.position.x = atom1.position.x ;
-      cylinder.position.y = atom1.position.y ;
-      cylinder.position.z = atom1.position.z ;
+      cylinder.position.x = atom1.position.x - moleculeCenter.x;
+      cylinder.position.y = atom1.position.y - moleculeCenter.y;
+      cylinder.position.z = atom1.position.z - moleculeCenter.z;
       cylinder.lookAt(point2);
 
       moleculeGroup.add( cylinder );
 
     }
 
-    moleculeGroup.translateX(-(Number(limits.x.min) + Number(limits.x.max))/2);
-    moleculeGroup.translateY(-(Number((limits.y.min)) + Number(limits.y.max))/2);
-    moleculeGroup.translateY(-(Number((limits.z.min)) + Number(limits.z.max))/2);
+    // moleculeGroup.translateX(-(Number((limits.x.min)) + Number(limits.x.max))/2);
+    // moleculeGroup.translateY(-(Number((limits.y.min)) + Number(limits.y.max))/2);
+    // moleculeGroup.translateZ(-(Number((limits.z.min)) + Number(limits.z.max))/2);
 
 
-    console.log(( limits));
+    console.log(( limits ));
+
+
+    let spotLight = new THREE.SpotLight( 0xffffff );
+    spotLight.position.set( 100, 1000, 100 );
+
+    spotLight.castShadow = true;
+
+    spotLight.shadow.mapSize.width = 1024;
+    spotLight.shadow.mapSize.height = 1024;
+
+    spotLight.shadow.camera.near = 500;
+    spotLight.shadow.camera.far = 4000;
+    spotLight.shadow.camera.fov = 30;
+
+    scene.add( spotLight);
 
 
     const light = new THREE.AmbientLight( 0xffffff ); // soft white light
@@ -338,14 +376,24 @@ function init() {
 
 
     scene.add( moleculeGroup );
+
 }
 
 
 function animate() {
     requestAnimationFrame( animate );
+    deltaTime = clock.getDelta();
+    moleculeGroup.rotation.y += 0.01;
 
     renderer.render( scene, camera );
 };
+
+window.addEventListener('resize', function(){
+    camera.aspect = threeArea.offsetWidth / threeArea.offsetHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize( threeArea.offsetWidth, threeArea.offsetHeight );
+}, false);
+
   </script>
 <%- include('partials/footer') %>
 
